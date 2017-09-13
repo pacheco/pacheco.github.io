@@ -4,10 +4,16 @@ title: About
 permalink: /about/
 ---
 
-Nothing to see here...
+Currently, I'm a PhD student at the University of Lugano, Switzerland.
 
-### More Information
+### Interests
+
+- Design and implementation of distributed systems
+- Replication algorithms
+- Distributed databases and filesystems
+- Fault-tolerance
+- Geo-distribution
 
 ### Contact me
 
-[{{ site.email }}](mailto:{{ email@domain.com }})
+[{{ site.email }}](mailto:{{ site.email }})
