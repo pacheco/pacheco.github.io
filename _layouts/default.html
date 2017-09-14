@@ -24,6 +24,7 @@
           <div class="site-info">
             <h1 class="site-name"><a href="{{ site.baseurl }}/">{{ site.name }}</a></h1>
             <p class="site-description">{{ site.description }}</p>
+            <div class="svg-icons">{% include svg-icons.html %}</div>
           </div>
 
           <nav>
@@ -41,7 +42,6 @@
     <div class="wrapper-footer">
       <div class="container">
         <footer class="footer">
-          <div>{% include svg-icons.html %}</div>
           <div>Copyright &copy; {{ 'now' | date: "%Y" }}</div>
         </footer>
       </div>
