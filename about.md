@@ -17,7 +17,7 @@ Some specific topics:
 - Distributed databases and filesystems
 - Geo-distribution
 - Byzantine fault-tolerance
-- Cryptocurrencies
+- Blockchain/Cryptocurrencies
 
 ### Contact me
 
