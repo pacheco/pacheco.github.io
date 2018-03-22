@@ -1,0 +1,55 @@
+==================================================================
+https://keybase.io/pacheco
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of http://leandropacheco.com
+  * I am pacheco (https://keybase.io/pacheco) on keybase.
+  * I have a public key ASAZR2WMfBpCRXufvQUBT2wb75b1a0d2nXda1x_bx_fOtAo
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "01201947658c7c1a42457b9fbd05014f6c1bef96f56b47769d775ad71fdbc7f7ceb40a",
+      "host": "keybase.io",
+      "kid": "01201947658c7c1a42457b9fbd05014f6c1bef96f56b47769d775ad71fdbc7f7ceb40a",
+      "uid": "1571e2e663aadb143cfd6f0e77db8019",
+      "username": "pacheco"
+    },
+    "merkle_root": {
+      "ctime": 1521732929,
+      "hash": "837d2a2b3d08ae7283aab087130c1d51109b50e48a31b17609d0e73bdc61782d4fbf6f7c76690998bf4534a414dfd812e0805e1f54f962e956b38db084f57e2d",
+      "hash_meta": "7284079d7f8bc7211a70596c8e00cf925d97ad230567b7a4d7befdb3735881bc",
+      "seqno": 2272906
+    },
+    "service": {
+      "hostname": "leandropacheco.com",
+      "protocol": "http:"
+    },
+    "type": "web_service_binding",
+    "version": 1
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "1.0.45"
+  },
+  "ctime": 1521732948,
+  "expire_in": 504576000,
+  "prev": "4b03ec104cc510385ada42c54c311095ccf591cf5bb98d8a9ed1459c0e64d44f",
+  "seqno": 15,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgGUdljHwaQkV7n70FAU9sG++W9WtHdp13Wtcf28f3zrQKp3BheWxvYWTFA0l7ImJvZHkiOnsia2V5Ijp7ImVsZGVzdF9raWQiOiIwMTIwMTk0NzY1OGM3YzFhNDI0NTdiOWZiZDA1MDE0ZjZjMWJlZjk2ZjU2YjQ3NzY5ZDc3NWFkNzFmZGJjN2Y3Y2ViNDBhIiwiaG9zdCI6ImtleWJhc2UuaW8iLCJraWQiOiIwMTIwMTk0NzY1OGM3YzFhNDI0NTdiOWZiZDA1MDE0ZjZjMWJlZjk2ZjU2YjQ3NzY5ZDc3NWFkNzFmZGJjN2Y3Y2ViNDBhIiwidWlkIjoiMTU3MWUyZTY2M2FhZGIxNDNjZmQ2ZjBlNzdkYjgwMTkiLCJ1c2VybmFtZSI6InBhY2hlY28ifSwibWVya2xlX3Jvb3QiOnsiY3RpbWUiOjE1MjE3MzI5MjksImhhc2giOiI4MzdkMmEyYjNkMDhhZTcyODNhYWIwODcxMzBjMWQ1MTEwOWI1MGU0OGEzMWIxNzYwOWQwZTczYmRjNjE3ODJkNGZiZjZmN2M3NjY5MDk5OGJmNDUzNGE0MTRkZmQ4MTJlMDgwNWUxZjU0Zjk2MmU5NTZiMzhkYjA4NGY1N2UyZCIsImhhc2hfbWV0YSI6IjcyODQwNzlkN2Y4YmM3MjExYTcwNTk2YzhlMDBjZjkyNWQ5N2FkMjMwNTY3YjdhNGQ3YmVmZGIzNzM1ODgxYmMiLCJzZXFubyI6MjI3MjkwNn0sInNlcnZpY2UiOnsiaG9zdG5hbWUiOiJsZWFuZHJvcGFjaGVjby5jb20iLCJwcm90b2NvbCI6Imh0dHA6In0sInR5cGUiOiJ3ZWJfc2VydmljZV9iaW5kaW5nIiwidmVyc2lvbiI6MX0sImNsaWVudCI6eyJuYW1lIjoia2V5YmFzZS5pbyBnbyBjbGllbnQiLCJ2ZXJzaW9uIjoiMS4wLjQ1In0sImN0aW1lIjoxNTIxNzMyOTQ4LCJleHBpcmVfaW4iOjUwNDU3NjAwMCwicHJldiI6IjRiMDNlYzEwNGNjNTEwMzg1YWRhNDJjNTRjMzExMDk1Y2NmNTkxY2Y1YmI5OGQ4YTllZDE0NTljMGU2NGQ0NGYiLCJzZXFubyI6MTUsInRhZyI6InNpZ25hdHVyZSJ9o3NpZ8RAC0P2ZKx0KIIQzrBYcVvNTMfXu2m80B3fTMcYV/iy5FlReZ1jVDe9RTGFCijU6y35r5WYN5kphIUovPj/8YrCAahzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEIA7RDzB/2yfAMXuSGN9WUmKO5Q7NBXM0Wll9IVo+7jqco3RhZ80CAqd2ZXJzaW9uAQ==
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/pacheco
+
+==================================================================
