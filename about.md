@@ -4,7 +4,8 @@ title: About
 permalink: /about/
 ---
 
-Currently, I'm a PhD student at the University of Lugano, Switzerland.
+I'm a software engineer with a background in distributed systems and algorithms.
+I have a PhD in Informatics from USI (Università della Svizzera italiana), in Lugano, Switzerland.
 
 ### Interests
 
