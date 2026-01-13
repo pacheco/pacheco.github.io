@@ -336,6 +336,34 @@
 
         <!-- Visualization Section (hidden initially) -->
         <div id="vizSection" style="display: none;">
+            <!-- Trace Cells Summary -->
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="chart-container">
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <div class="p-2">
+                                    <div class="text-muted small">Original Trace Cells</div>
+                                    <div id="originalTraceCells" class="fs-4 fw-bold text-secondary">-</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-2">
+                                    <div class="text-muted small">Optimized Trace Cells</div>
+                                    <div id="optimizedTraceCells" class="fs-4 fw-bold text-primary">-</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-2">
+                                    <div class="text-muted small">Saved Trace Cells</div>
+                                    <div id="savedTraceCells" class="fs-4 fw-bold text-success">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-12">
                     <div class="chart-container">
@@ -748,6 +776,16 @@
         function updateVisualization() {
             const data = processData();
             const totalCells = data.reduce((sum, d) => sum + d.software_version_cells, 0);
+
+            // Calculate trace cells summary
+            const originalTraceCells = currentData.reduce((sum, item) => sum + item.execution_frequency * item.cost_before, 0);
+            const optimizedTraceCells = currentData.reduce((sum, item) => sum + item.execution_frequency * item.cost_after, 0);
+            const savedTraceCells = originalTraceCells - optimizedTraceCells;
+
+            // Update trace cells display
+            document.getElementById('originalTraceCells').textContent = formatCellCount(originalTraceCells);
+            document.getElementById('optimizedTraceCells').textContent = formatCellCount(optimizedTraceCells);
+            document.getElementById('savedTraceCells').textContent = formatCellCount(savedTraceCells) + ` (${((savedTraceCells / originalTraceCells) * 100).toFixed(1)}%)`;
 
             // Calculate weighted mean
             const meanEffectiveness = data.reduce((sum, d) => sum + d.effectiveness * d.software_version_cells, 0) / totalCells;
