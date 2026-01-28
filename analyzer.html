@@ -745,7 +745,7 @@
         function processData() {
             const effType = effectivenessType.value;
             const processed = currentData.map(item => {
-                const blocks = item.original_block.blocks;
+                const blocks = item.block.blocks;
                 // Concatenate all statements from contained blocks
                 const allStatements = blocks.flatMap(b => b.statements);
                 // Use sequence of start_pcs as the block identifier
@@ -817,7 +817,7 @@
 
             // Sort blocks by first PC to process them in order
             const sortedBlocks = [...currentData].sort((a, b) =>
-                a.original_block.blocks[0].start_pc - b.original_block.blocks[0].start_pc
+                a.block.blocks[0].start_pc - b.block.blocks[0].start_pc
             );
 
             // Track current active label(s)
@@ -825,7 +825,7 @@
 
             // Iterate through all blocks in PC order
             sortedBlocks.forEach(item => {
-                const firstPc = item.original_block.blocks[0].start_pc;
+                const firstPc = item.block.blocks[0].start_pc;
                 const pcKey = firstPc.toString();
 
                 // Check if this block starts a new label
@@ -880,11 +880,11 @@
             const labelArray = Object.values(labelStats).map(stat => {
                 // Process and sort blocks
                 const processedBlocks = stat.blocks.map(block => {
-                    const blockId = getBlockId(block.original_block.blocks);
-                    const allStatements = block.original_block.blocks.flatMap(b => b.statements);
+                    const blockId = getBlockId(block.block.blocks);
+                    const allStatements = block.block.blocks.flatMap(b => b.statements);
                     return {
                         block_id: blockId,
-                        pc: block.original_block.blocks[0].start_pc,
+                        pc: block.block.blocks[0].start_pc,
                         traceCells: block.width_before * block.execution_frequency,
                         effectiveness: calculateEffectiveness(block, effType),
                         instructions: allStatements.length
