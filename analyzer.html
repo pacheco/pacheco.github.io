@@ -44,7 +44,7 @@
             stroke: #ffc10755 !important;
             stroke-width: 2 !important;
         }
-        
+
         .bar-selected {
             stroke: #ffc107 !important;
             stroke-width: 4 !important;
@@ -64,7 +64,7 @@
             font-weight: bold;
             color: #1565c0;
             font-family: 'Courier New', monospace;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             display: none;
             cursor: pointer;
             transition: background-color 0.2s;
@@ -287,6 +287,8 @@
     <nav class="navbar navbar-dark bg-primary">
         <div class="container-fluid">
             <span class="navbar-brand mb-0 h1" id="pageTitle" style="cursor: pointer;">APC Effectiveness Analyzer</span>
+            <span class="text-white small ms-auto text-end" id="dataSourceDisplay"
+                style="display:none; flex:1 1 auto; max-width:calc(100vw - 220px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-family: 'Courier New', monospace;"></span>
         </div>
     </nav>
 
@@ -302,7 +304,8 @@
                 <div class="mt-3">
                     <div class="input-group">
                         <span class="input-group-text">Or paste URL:</span>
-                        <input type="text" id="urlInput" class="form-control" placeholder="https://example.com/data.json or GitHub link">
+                        <input type="text" id="urlInput" class="form-control"
+                            placeholder="https://example.com/data.json or GitHub link">
                         <button class="btn btn-primary" id="loadUrlBtn">Load from URL</button>
                     </div>
                     <small class="text-muted">Supports direct JSON URLs and GitHub file links</small>
@@ -310,97 +313,108 @@
             </div>
         </div>
 
-        <!-- Controls Section (hidden initially) -->
-        <div id="controlsSection" class="row mb-4" style="display: none;">
-            <div class="col-12">
-                <div class="row align-items-end">
-                    <div class="col-md-3">
-                        <label for="effectivenessType" class="form-label">Effectiveness Metric:</label>
-                        <select id="effectivenessType" class="form-select">
-                            <option value="cost" selected>Cost</option>
-                            <option value="main_columns">Main Columns</option>
-                            <option value="constraints">Constraints</option>
-                            <option value="bus_interactions">Bus Interactions</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3 ms-auto">
-                        <label for="pcSearch" class="form-label">Block ID:</label>
-                        <div class="input-group">
-                            <input type="text" id="pcSearch" class="form-control">
-                            <button class="btn btn-primary" id="pcSearchBtn">Go</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Visualization Section (hidden initially) -->
-        <div id="vizSection" style="display: none;">
-            <!-- Trace Cells Summary -->
-            <div class="row mb-3">
-                <div class="col-12">
-                    <div class="chart-container">
-                        <div class="row text-center">
-                            <div class="col-md-4">
-                                <div class="p-2">
-                                    <div class="text-muted small">Original Trace Cells</div>
-                                    <div id="originalTraceCells" class="fs-4 fw-bold text-secondary">-</div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="p-2">
-                                    <div class="text-muted small">Optimized Trace Cells</div>
-                                    <div id="optimizedTraceCells" class="fs-4 fw-bold text-primary">-</div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="p-2">
-                                    <div class="text-muted small">Saved Trace Cells</div>
-                                    <div id="savedTraceCells" class="fs-4 fw-bold text-success">-</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+        <!-- Main App Section (hidden initially) -->
+        <div id="appSection" style="display: none;">
             <div class="row">
-                <div class="col-12">
-                    <div class="chart-container">
-                        <div id="chart"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Labels Summary Section -->
-            <div class="row mt-4" id="labelsSummarySection" style="display: none;">
-                <div class="col-12">
-                    <div class="chart-container">
-                        <div class="collapsible-header" id="labelsHeader">
-                            <span class="collapse-icon collapsed">▼</span>
-                            <h5 style="margin: 0;">Labels</h5>
+                <!-- Left column: plot + labels + code -->
+                <div class="col-12 col-lg-9">
+                    <div id="vizSection">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="chart-container">
+                                    <ul class="nav nav-pills mb-3" id="chartTabs" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active" id="tab-effectiveness"
+                                                type="button">Effectiveness by Basic Block</button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="tab-secondary" type="button">Saved proving cost
+                                                vs added verifier cost</button>
+                                        </li>
+                                    </ul>
+                                    <div id="chartTabEffectiveness">
+                                        <div id="chart"></div>
+                                    </div>
+                                    <div id="chartTabSecondary" style="display: none;">
+                                        <div id="chartValueCost"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div id="labelsContent" style="display: none; margin-top: 10px;">
-                            <div class="labels-table-wrapper">
-                                <div id="labelsTableContainer"></div>
+
+                        <!-- Labels Summary Section -->
+                        <div class="row mt-4" id="labelsSummarySection" style="display: none;">
+                            <div class="col-12">
+                                <div class="chart-container">
+                                    <div class="collapsible-header" id="labelsHeader">
+                                        <span class="collapse-icon collapsed">▼</span>
+                                        <h5 style="margin: 0;">Labels</h5>
+                                    </div>
+                                    <div id="labelsContent" style="display: none; margin-top: 10px;">
+                                        <div class="labels-table-wrapper">
+                                            <div id="labelsTableContainer"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Code Panel Section -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="chart-container">
+                                    <h5>Program Code</h5>
+                                    <div class="code-panel-container">
+                                        <div id="stickyLabelHeader" class="sticky-label-header"></div>
+                                        <div id="codePanel" class="code-panel">
+                                            <span class="text-muted">No data loaded</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Code Panel Section -->
-            <div class="row mt-4">
-                <div class="col-12">
-                    <div class="chart-container">
-                        <h5>Program Code</h5>
-                        <div class="mb-2">
-                            <span id="codeBlockInfo" class="text-muted">Click on a bar or code line to select a block</span>
+                <!-- Right column: controls -->
+                <div class="col-12 col-lg-3">
+                    <div id="infoSection" class="mb-4" style="display: none;">
+                        <div class="chart-container">
+                            <h5>Info</h5>
+                            <p class="text-muted small" id="plotInfoText" style="margin-bottom: 0;">
+                            </p>
                         </div>
-                        <div class="code-panel-container">
-                            <div id="stickyLabelHeader" class="sticky-label-header"></div>
-                            <div id="codePanel" class="code-panel">
-                                <span class="text-muted">No data loaded</span>
+                    </div>
+
+                    <div id="controlsSection" class="mb-4" style="display: none;">
+                        <div class="chart-container">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="effectivenessType" class="form-label">Cost Metric:</label>
+                                    <select id="effectivenessType" class="form-select">
+                                        <option value="cost" selected>Total Cost</option>
+                                        <option value="main_columns">Main Columns</option>
+                                        <option value="constraints">Constraints</option>
+                                        <option value="bus_interactions">Bus Interactions</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label for="pcSearch" class="form-label">Block ID:</label>
+                                    <div class="input-group">
+                                        <input type="text" id="pcSearch" class="form-control">
+                                        <button class="btn btn-primary" id="pcSearchBtn">Go</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="selectedBlockSection" class="mb-4" style="display: none;">
+                        <div class="chart-container">
+                            <h5>Selected Block</h5>
+                            <div class="mb-2">
+                                <span id="codeBlockInfo" class="text-muted">Click on a bar or code line to select a
+                                    block</span>
                             </div>
                         </div>
                     </div>
@@ -414,17 +428,52 @@
         let currentLabels = {};
         let chart = null;
         let selectedBlock = null;
+        let lastData = null;
+        let lastMeanEffectiveness = null;
 
         // File handling
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
         const uploadSection = document.getElementById('uploadSection');
+        const appSection = document.getElementById('appSection');
         const controlsSection = document.getElementById('controlsSection');
         const vizSection = document.getElementById('vizSection');
         const effectivenessType = document.getElementById('effectivenessType');
         const pageTitle = document.getElementById('pageTitle');
+        const dataSourceDisplay = document.getElementById('dataSourceDisplay');
         const pcSearch = document.getElementById('pcSearch');
         const pcSearchBtn = document.getElementById('pcSearchBtn');
+        const tabEffectiveness = document.getElementById('tab-effectiveness');
+        const tabSecondary = document.getElementById('tab-secondary');
+        const chartTabEffectiveness = document.getElementById('chartTabEffectiveness');
+        const chartTabSecondary = document.getElementById('chartTabSecondary');
+        const plotInfoText = document.getElementById('plotInfoText');
+
+        // Plot point sizing (value-cost plot)
+        const POINT_RADIUS = 3;
+        const HOVER_RADIUS = 6;
+        const SELECTED_RADIUS = 6;
+
+        const DATA_DISPLAY_MAX = 70;
+        const DATA_DISPLAY_HEAD = 35;
+        const DATA_DISPLAY_TAIL = 35;
+
+        function shortenUrl(urlText) {
+            if (urlText.length <= DATA_DISPLAY_MAX) return urlText;
+            return `${urlText.slice(0, DATA_DISPLAY_HEAD)}...${urlText.slice(-DATA_DISPLAY_TAIL)}`;
+        }
+
+        function updateDataSourceDisplay(source) {
+            if (source) {
+                const displayText = shortenUrl(source.replace(/^https?:\/\//i, ''));
+                const href = source;
+                dataSourceDisplay.innerHTML = `Data: <a href="${href}" target="_blank" rel="noopener noreferrer" style="color: white; text-decoration: underline;">${displayText}</a>`;
+                dataSourceDisplay.style.display = 'inline';
+            } else {
+                dataSourceDisplay.innerHTML = '';
+                dataSourceDisplay.style.display = 'none';
+            }
+        }
 
         // Drop zone events
         dropZone.addEventListener('click', () => fileInput.click());
@@ -457,6 +506,38 @@
         const urlInput = document.getElementById('urlInput');
         const loadUrlBtn = document.getElementById('loadUrlBtn');
 
+        tabEffectiveness.addEventListener('click', () => {
+            tabEffectiveness.classList.add('active');
+            tabSecondary.classList.remove('active');
+            chartTabEffectiveness.style.display = 'block';
+            chartTabSecondary.style.display = 'none';
+            updateInfoText();
+            if (lastData) {
+                const totalBefore = lastData.reduce((sum, d) => sum + d.metric_before, 0);
+                createChart(lastData, totalBefore, lastMeanEffectiveness || 0);
+            } else if (currentData) {
+                updateVisualization();
+            }
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.delete('plot');
+            window.history.replaceState({}, document.title, newUrl);
+        });
+
+        tabSecondary.addEventListener('click', () => {
+            tabSecondary.classList.add('active');
+            tabEffectiveness.classList.remove('active');
+            chartTabEffectiveness.style.display = 'none';
+            chartTabSecondary.style.display = 'block';
+            updateInfoText();
+            if (lastData) {
+                createValueCostPlot(lastData);
+            } else if (currentData) {
+                createValueCostPlot(processData());
+            }
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.set('plot', 'value-cost');
+            window.history.replaceState({}, document.title, newUrl);
+        });
         loadUrlBtn.addEventListener('click', loadFromUrl);
         urlInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -481,17 +562,19 @@
             try {
                 loadUrlBtn.disabled = true;
                 loadUrlBtn.textContent = 'Loading...';
-                
+
                 const response = await fetch(fetchUrl);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                
+
                 const text = await response.text();
                 try {
                     const jsonData = JSON.parse(text);
                     loadData(jsonData);
+                    updateDataSourceDisplay(url);
                     uploadSection.style.display = 'none';
+                    appSection.style.display = 'block';
                     controlsSection.style.display = 'block';
                     vizSection.style.display = 'block';
                     updateVisualization();
@@ -513,13 +596,13 @@
 
         effectivenessType.addEventListener('change', () => {
             if (currentData) {
-                const selectedBlockId = selectedBlock ? selectedBlock.block_id : null;
+                const selectedId = selectedBlock ? selectedBlock.block_id : null;
                 updateVisualization();
 
                 // Restore selection if it exists
-                if (selectedBlockId) {
+                if (selectedId) {
                     const data = processData();
-                    const block = data.find(d => d.block_id === selectedBlockId);
+                    const block = data.find(d => d.block_id === selectedId);
                     if (block) {
                         selectBlock(block);
                     }
@@ -545,7 +628,6 @@
             if (!input) {
                 // Empty input means unselect
                 selectBlock(null);
-                hideSearchResults();
                 return;
             }
 
@@ -562,103 +644,37 @@
                 return;
             }
 
-            // Find all blocks that contain this PC
+            // Find the superblock that contains this PC in any of its basic blocks
             // Each instruction is 4 bytes, so PC advances by 4
             const data = processData();
-            const matches = data.filter(d => {
+            const block = data.find(d => {
                 if (d.is_other) return false; // Skip "Other" grouped blocks
-                // Check all sub-blocks within this APC
-                return d.blocks.some(subBlock => {
-                    const startPc = subBlock.start_pc;
-                    const endPc = startPc + (subBlock.statements.length * 4);
-                    return pcValue >= startPc && pcValue < endPc;
+                return d.original_blocks.some(b => {
+                    const endPc = b.start_pc + b.instructions.length * 4;
+                    return pcValue >= b.start_pc && pcValue < endPc;
                 });
             });
 
-            if (matches.length === 0) {
-                alert(`No block found containing PC: 0x${pcValue.toString(16)} (${pcValue})`);
-                hideSearchResults();
-            } else if (matches.length === 1) {
-                selectBlock(matches[0]);
-                hideSearchResults();
+            if (block) {
+                selectBlock(block);
             } else {
-                // Multiple matches - show selection dropdown
-                showSearchResults(matches, pcValue);
+                alert(`No block found containing PC: 0x${pcValue.toString(16)} (${pcValue})`);
             }
         }
 
-        function showSearchResults(matches, pcValue) {
-            let resultsDiv = document.getElementById('searchResults');
-            if (!resultsDiv) {
-                resultsDiv = document.createElement('div');
-                resultsDiv.id = 'searchResults';
-                resultsDiv.style.cssText = 'position: absolute; background: white; border: 1px solid #dee2e6; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); max-height: 300px; overflow-y: auto; z-index: 1000; width: 100%;';
-                pcSearch.parentElement.style.position = 'relative';
-                pcSearch.parentElement.appendChild(resultsDiv);
-            }
-
-            resultsDiv.innerHTML = `
-                <div style="padding: 8px; background: #f8f9fa; border-bottom: 1px solid #dee2e6; font-weight: bold;">
-                    ${matches.length} blocks contain PC 0x${pcValue.toString(16)}
-                </div>
-                ${matches.map(block => {
-                    const pcs = block.blocks.map(b => '0x' + b.start_pc.toString(16)).join(' → ');
-                    return `
-                        <div class="search-result-item" data-block-id="${block.block_id}"
-                             style="padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #eee; font-family: monospace; font-size: 12px;">
-                            <div><strong>${pcs}</strong></div>
-                            <div style="color: #666; font-size: 11px;">
-                                ${block.blocks.length} sub-blocks, ${block.instructions} instructions, effectiveness: ${block.effectiveness.toFixed(2)}
-                            </div>
-                        </div>
-                    `;
-                }).join('')}
-            `;
-            resultsDiv.style.display = 'block';
-
-            // Add click handlers
-            resultsDiv.querySelectorAll('.search-result-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    const blockId = this.getAttribute('data-block-id');
-                    const data = processData();
-                    const block = data.find(d => d.block_id === blockId);
-                    if (block) {
-                        selectBlock(block);
-                    }
-                    hideSearchResults();
-                });
-                item.addEventListener('mouseenter', function() {
-                    this.style.backgroundColor = '#e9ecef';
-                });
-                item.addEventListener('mouseleave', function() {
-                    this.style.backgroundColor = '';
-                });
-            });
-        }
-
-        function hideSearchResults() {
-            const resultsDiv = document.getElementById('searchResults');
-            if (resultsDiv) {
-                resultsDiv.style.display = 'none';
-            }
-        }
-
-        // Hide search results when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('#pcSearch') && !e.target.closest('#searchResults') && !e.target.closest('#pcSearchBtn')) {
-                hideSearchResults();
-            }
-        });
-        
         pageTitle.addEventListener('click', () => {
             currentData = null;
             currentLabels = {};
             selectedBlock = null;
             uploadSection.style.display = 'block';
+            appSection.style.display = 'none';
             controlsSection.style.display = 'none';
+            document.getElementById('selectedBlockSection').style.display = 'none';
+            document.getElementById('infoSection').style.display = 'none';
             vizSection.style.display = 'none';
             fileInput.value = '';
             urlInput.value = '';
+            updateDataSourceDisplay('');
             // Clear URL parameters when returning to upload screen
             window.history.replaceState({}, document.title, window.location.pathname);
         });
@@ -667,10 +683,16 @@
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const dataUrl = urlParams.get('url') || urlParams.get('data');
-            
+            const plotParam = urlParams.get('plot');
+
             if (dataUrl) {
                 urlInput.value = dataUrl;
                 loadFromUrl();
+            }
+            if (plotParam === 'value-cost') {
+                tabSecondary.click();
+            } else {
+                updateInfoText();
             }
         });
 
@@ -685,7 +707,9 @@
                 try {
                     const jsonData = JSON.parse(e.target.result);
                     loadData(jsonData);
+                    updateDataSourceDisplay('');
                     uploadSection.style.display = 'none';
+                    appSection.style.display = 'block';
                     controlsSection.style.display = 'block';
                     vizSection.style.display = 'block';
                     updateVisualization();
@@ -696,36 +720,85 @@
             reader.readAsText(file);
         }
 
-        function loadData(jsonData) {
-            // Backwards compatible: check if it's the new format with "apcs" and "labels" keys
-            if (jsonData && typeof jsonData === 'object' && !Array.isArray(jsonData) &&
-                'apcs' in jsonData && 'labels' in jsonData) {
-                // New format
-                currentData = jsonData.apcs;
-                currentLabels = jsonData.labels;
-            } else {
-                // Old format - assume it's the array of APCs directly
-                currentData = jsonData;
-                currentLabels = {};
-            }
+        function updateApcDataV1(apc) {
+            // Normalize old single-block format into original_blocks array
+            apc.original_blocks = [{
+                start_pc: apc.original_block.start_pc,
+                instructions: apc.original_block.statements,
+            }];
+            return apc;
         }
 
-        function calculateEffectiveness(item, effType) {
+        // json is a direct list of APCs
+        function loadDataV0(jsonData) {
+            return { data: jsonData.map(updateApcDataV1), labels: {} };
+        }
+
+        // json with APCs and labels but no version
+        function loadDataV1(jsonData) {
+            return { data: jsonData.apcs.map(updateApcDataV1), labels: jsonData.labels };
+        }
+
+        // json in version 2 or 3. The difference is that the `apc_candidate_file` field doesn't exist,
+        // which is not used in the visualization anyway, so we can use the same loader for both versions.
+        function loadDataV2V3(jsonData) {
+            const apcs = jsonData.apcs.map(apc => {
+                apc.original_blocks = [apc.original_block];
+                return apc;
+            });
+            return { data: apcs, labels: jsonData.labels };
+        }
+
+        // json in version 4: original_blocks is a list of BasicBlocks (may be more than one).
+        function loadDataV4(jsonData) {
+            return { data: jsonData.apcs, labels: jsonData.labels };
+        }
+
+        function loadData(jsonData) {
+            // Handle backward compatibility with older json formats
+            let result;
+            if (Array.isArray(jsonData)) {
+                result = loadDataV0(jsonData);
+            } else if (!('version' in jsonData)) {
+                result = loadDataV1(jsonData);
+            } else {
+                switch (jsonData.version) {
+                    case 2: result = loadDataV2V3(jsonData); break;
+                    case 3: result = loadDataV2V3(jsonData); break;
+                    case 4: result = loadDataV4(jsonData); break;
+                    default: throw new Error(`Unsupported version: ${jsonData.version}`);
+                }
+            }
+            currentData = result.data;
+            currentLabels = result.labels;
+            // Show right-side panes when data is loaded
+            document.getElementById('selectedBlockSection').style.display = 'block';
+            document.getElementById('infoSection').style.display = 'block';
+            controlsSection.style.display = 'block';
+            updateInfoText();
+        }
+
+        function getMetricValues(item, effType) {
             switch (effType) {
                 case 'cost':
-                    return item.cost_before / item.cost_after;
+                    return { before: item.cost_before, after: item.cost_after };
                 case 'main_columns':
-                    return item.stats.before.main_columns / item.stats.after.main_columns;
+                    return { before: item.stats.before.main_columns, after: item.stats.after.main_columns };
                 case 'constraints':
-                    return item.stats.before.constraints / item.stats.after.constraints;
+                    return { before: item.stats.before.constraints, after: item.stats.after.constraints };
                 case 'bus_interactions':
-                    return item.stats.before.bus_interactions / item.stats.after.bus_interactions;
+                    return { before: item.stats.before.bus_interactions, after: item.stats.after.bus_interactions };
                 default:
                     throw new Error(`Unknown effectiveness type: ${effType}`);
             }
         }
 
-        function formatCellCount(count) {
+        function calculateEffectiveness(item, effType) {
+            const { before, after } = getMetricValues(item, effType);
+            return before / after;
+        }
+
+        function formatMetric(count) {
             if (count >= 1e9) {
                 return (count / 1e9).toFixed(1) + 'B';
             } else if (count >= 1e6) {
@@ -737,61 +810,62 @@
             }
         }
 
-        function getBlockId(blocks) {
-            // Create a unique ID from the sequence of start_pcs
-            return blocks.map(b => b.start_pc).join('-');
-        }
-
         function processData() {
             const effType = effectivenessType.value;
             const processed = currentData.map(item => {
-                const blocks = item.block.blocks;
-                // Concatenate all statements from contained blocks
-                const allStatements = blocks.flatMap(b => b.statements);
-                // Use sequence of start_pcs as the block identifier
-                const blockId = getBlockId(blocks);
-                // First start_pc for display purposes
-                const firstPc = blocks[0].start_pc;
-
+                const { before, after } = getMetricValues(item, effType);
+                const metric_before = before * item.execution_frequency;
+                const metric_after = after * item.execution_frequency;
+                const value = (before - after) * item.execution_frequency;
+                const density = metric_after > 0 ? value / after : 0;
+                const lastBlock = item.original_blocks[item.original_blocks.length - 1];
+                const block_pcs = item.original_blocks.map(b => b.start_pc);
                 return {
-                    block_id: blockId,
-                    start_pc: firstPc,  // Keep for backwards compatibility
-                    blocks: blocks,  // Keep the sub-blocks for code display
-                    effectiveness: calculateEffectiveness(item, effType),
-                    instructions: allStatements.length,
-                    software_version_cells: item.width_before * item.execution_frequency,
+                    start_pc: item.original_blocks[0].start_pc,
+                    block_id: block_pcs.map(pc => '0x' + pc.toString(16)).join(','),
+                    block_pcs,
+                    original_blocks: item.original_blocks,
+                    end_pc: lastBlock.start_pc + lastBlock.instructions.length * 4,
+                    effectiveness: before / after,
+                    instructions: item.original_blocks.reduce((sum, b) => sum + b.instructions.length, 0),
+                    software_version_cells: metric_before, // alias used throughout charting
+                    metric_before,
+                    metric_after,
+                    metric_before_raw: before,
+                    metric_after_raw: after,
+                    value,
+                    density,
                     width_before: item.width_before,
                     execution_frequency: item.execution_frequency,
-                    statements: allStatements,  // Concatenated code statements
+                    statements: item.original_blocks.flatMap(b => b.instructions),  // flat list for legacy uses
                     stats_after: item.stats.after  // Keep APC stats
                 };
             });
 
-            // Sort by software_version_cells descending
-            processed.sort((a, b) => b.software_version_cells - a.software_version_cells);
+            // Sort by metric_before (matches Python)
+            processed.sort((a, b) => b.metric_before - a.metric_before);
 
             return processed;
         }
 
         function updateVisualization() {
             const data = processData();
-            const totalCells = data.reduce((sum, d) => sum + d.software_version_cells, 0);
+            const totalBefore = data.reduce((sum, d) => sum + d.metric_before, 0);
+            const totalAfter = data.reduce((sum, d) => sum + d.metric_after, 0);
 
-            // Calculate trace cells summary
-            const originalTraceCells = currentData.reduce((sum, item) => sum + item.execution_frequency * item.cost_before, 0);
-            const optimizedTraceCells = currentData.reduce((sum, item) => sum + item.execution_frequency * item.cost_after, 0);
-            const savedTraceCells = originalTraceCells - optimizedTraceCells;
+            // Calculate weighted mean (weight by cost after, matches Python)
+            const meanEffectiveness = totalAfter > 0
+                ? data.reduce((sum, d) => sum + d.effectiveness * d.metric_after, 0) / totalAfter
+                : 0;
 
-            // Update trace cells display
-            document.getElementById('originalTraceCells').textContent = formatCellCount(originalTraceCells);
-            document.getElementById('optimizedTraceCells').textContent = formatCellCount(optimizedTraceCells);
-            document.getElementById('savedTraceCells').textContent = formatCellCount(savedTraceCells) + ` (${((savedTraceCells / originalTraceCells) * 100).toFixed(1)}%)`;
+            lastData = data;
+            lastMeanEffectiveness = meanEffectiveness;
 
-            // Calculate weighted mean
-            const meanEffectiveness = data.reduce((sum, d) => sum + d.effectiveness * d.software_version_cells, 0) / totalCells;
-
-            // Create visualization
-            createChart(data, totalCells, meanEffectiveness);
+            // Create visualizations
+            createChart(data, totalBefore, meanEffectiveness);
+            if (chartTabSecondary.style.display !== 'none') {
+                createValueCostPlot(data);
+            }
 
             // Show all code in the code panel
             showAllCode();
@@ -803,7 +877,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const blockParam = urlParams.get('block');
             if (blockParam) {
-                // block_id is a sequence of PCs joined by '-'
+                // blockParam is a comma-separated list of hex PCs (block_id)
                 const block = data.find(d => d.block_id === blockParam);
                 if (block) {
                     selectBlock(block);
@@ -815,9 +889,9 @@
             const effType = effectivenessType.value;
             const labelStats = {};
 
-            // Sort blocks by first PC to process them in order
+            // Sort blocks by PC to process them in order
             const sortedBlocks = [...currentData].sort((a, b) =>
-                a.block.blocks[0].start_pc - b.block.blocks[0].start_pc
+                a.original_blocks[0].start_pc - b.original_blocks[0].start_pc
             );
 
             // Track current active label(s)
@@ -825,19 +899,21 @@
 
             // Iterate through all blocks in PC order
             sortedBlocks.forEach(item => {
-                const firstPc = item.block.blocks[0].start_pc;
-                const pcKey = firstPc.toString();
+                // Check all basic block PCs for label matches
+                const matchingPcKey = item.original_blocks
+                    .map(b => b.start_pc.toString())
+                    .find(key => currentLabels[key] && currentLabels[key].length > 0);
 
                 // Check if this block starts a new label
-                if (currentLabels[pcKey] && currentLabels[pcKey].length > 0) {
-                    currentActiveLabels = currentLabels[pcKey];
+                if (matchingPcKey) {
+                    currentActiveLabels = currentLabels[matchingPcKey];
 
                     // Initialize label stats if needed
                     currentActiveLabels.forEach(label => {
                         if (!labelStats[label]) {
                             labelStats[label] = {
                                 label: label,
-                                pc: firstPc,
+                                pc: item.original_blocks[0].start_pc,
                                 blocks: [],
                                 totalTraceCells: 0,
                                 totalCostBefore: 0,
@@ -879,17 +955,13 @@
             // Calculate effectiveness for each label (weighted by cost)
             const labelArray = Object.values(labelStats).map(stat => {
                 // Process and sort blocks
-                const processedBlocks = stat.blocks.map(block => {
-                    const blockId = getBlockId(block.block.blocks);
-                    const allStatements = block.block.blocks.flatMap(b => b.statements);
-                    return {
-                        block_id: blockId,
-                        pc: block.block.blocks[0].start_pc,
-                        traceCells: block.width_before * block.execution_frequency,
-                        effectiveness: calculateEffectiveness(block, effType),
-                        instructions: allStatements.length
-                    };
-                });
+                const processedBlocks = stat.blocks.map(block => ({
+                    pc: block.original_blocks[0].start_pc,
+                    block_pcs: block.original_blocks.map(b => b.start_pc),
+                    traceCells: block.width_before * block.execution_frequency,
+                    effectiveness: calculateEffectiveness(block, effType),
+                    instructions: block.original_blocks.reduce((sum, b) => sum + b.instructions.length, 0)
+                }));
 
                 // Sort blocks by the same criteria as the current label sort
                 sortBlocksInLabel(processedBlocks);
@@ -909,13 +981,288 @@
             return labelArray;
         }
 
+        function createValueCostPlot(data) {
+            const container = document.getElementById('chartValueCost');
+            if (!container) return;
+            d3.select(container).selectAll('*').remove();
+
+            // Sort by density (value / cost_after)
+            const sorted = [...data].sort((a, b) => b.density - a.density);
+
+            if (sorted.length === 0) {
+                container.innerHTML = '<span class="text-muted">No data available for value-cost plot.</span>';
+                return;
+            }
+
+            // Build cumulative arrays (cost scaled by execution frequency)
+            let cumulativeCost = 0;
+            let cumulativeValue = 0;
+            let cumulativeBefore = 0;
+            const series = sorted.map((d, idx) => {
+                cumulativeCost += d.metric_after_raw;
+                cumulativeValue += d.value;
+                cumulativeBefore += d.metric_before;
+                return { x: cumulativeCost, y: cumulativeValue, beforeCum: cumulativeBefore, block: d, idx };
+            });
+            const totalSoftwareCost = data.reduce((sum, d) => sum + d.metric_before, 0);
+
+            const margin = { top: 20, right: 20, bottom: 40, left: 60 };
+            const containerWidth = container.clientWidth || 300;
+            const width = containerWidth - margin.left - margin.right;
+            const height = 270 - margin.top - margin.bottom;
+
+            // Avoid log(0): start domain at min positive cost
+            const minCost = d3.min(series, d => d.x) || 1;
+            const maxCost = d3.max(series, d => d.x) || minCost;
+            const xScale = d3.scaleLog()
+                .domain([Math.max(1, minCost), maxCost])
+                .range([0, width]);
+
+            const yScale = d3.scaleLinear()
+                .domain([0, Math.max(d3.max(series, d => d.y), totalSoftwareCost)])
+                .range([height, 0]);
+
+            const svg = d3.select(container)
+                .append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+                .append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            // Hover guide lines
+            const guideH = svg.append('line')
+                .attr('stroke', '#bbbbbb')
+                .attr('stroke-dasharray', '4 4')
+                .attr('stroke-width', 1)
+                .style('display', 'none');
+            const guideV = svg.append('line')
+                .attr('stroke', '#bbbbbb')
+                .attr('stroke-dasharray', '4 4')
+                .attr('stroke-width', 1)
+                .style('display', 'none');
+            const guideHText = svg.append('text')
+                .style('fill', '#555')
+                .style('font-size', '11px')
+                .style('display', 'none');
+            const guideVText = svg.append('text')
+                .style('fill', '#555')
+                .style('font-size', '11px')
+                .style('display', 'none');
+
+            const line = d3.line()
+                .x(d => xScale(d.x))
+                .y(d => yScale(d.y))
+                .curve(d3.curveLinear);
+
+            // Background for deselect on click (send behind everything)
+            svg.append('rect')
+                .attr('width', width)
+                .attr('height', height)
+                .attr('fill', 'transparent')
+                .attr('pointer-events', 'all')
+                .on('click', () => selectBlock(null))
+                .lower();
+
+            svg.append('path')
+                .datum(series)
+                .attr('fill', 'none')
+                .attr('stroke', '#0d6efd')
+                .attr('stroke-width', 2)
+                .attr('d', line);
+
+            // Horizontal lines at percentages of total software cost (upper bound)
+            if (totalSoftwareCost > 0) {
+                const percentages = [0.2, 0.4, 0.6, 0.8, 1.0];
+                percentages.forEach(pct => {
+                    const yVal = totalSoftwareCost * pct;
+                    svg.append('line')
+                        .attr('x1', 0)
+                        .attr('x2', width)
+                        .attr('y1', yScale(yVal))
+                        .attr('y2', yScale(yVal))
+                        .attr('stroke', '#888')
+                        .attr('stroke-dasharray', '4 4')
+                        .attr('stroke-width', pct === 1 ? 1.5 : 1);
+
+                    const label = pct === 1
+                        ? `Software cost: ${formatMetric(yVal)}`
+                        : `${Math.round(pct * 100)}%`;
+
+                    svg.append('text')
+                        .attr('x', 5)
+                        .attr('y', yScale(yVal) - 6)
+                        .attr('text-anchor', 'start')
+                        .style('fill', '#666')
+                        .style('font-size', '11px')
+                        .text(label);
+                });
+            }
+
+            // Point labels for selected counts (powers of 10 and 3×powers of 10)
+            const refCounts = [];
+            const maxCount = series.length;
+            for (let p = 0; Math.pow(10, p) <= maxCount; p++) {
+                const pow = Math.pow(10, p);
+                if (p > 0) {
+                    refCounts.push(pow);
+                }
+                const three = 3 * pow;
+                if (three <= maxCount) refCounts.push(three);
+            }
+            const labelYOffset = 14;
+            refCounts.forEach((count, idx) => {
+                if (count > series.length || count < 1) return;
+                const point = series[count - 1];
+
+                svg.append('text')
+                    .attr('x', xScale(point.x))
+                    .attr('y', yScale(point.y) - labelYOffset)
+                    .attr('text-anchor', 'middle')
+                    .style('fill', '#555')
+                    .style('font-size', '11px')
+                    .text(`${count} APCs`);
+            });
+
+            // Tooltip
+            const tooltip = d3.select('body').append('div')
+                .attr('class', 'tooltip')
+                .style('opacity', 0);
+
+            // Secondary hover line text
+            const guideHText2 = svg.append('text')
+                .style('fill', '#555')
+                .style('font-size', '11px')
+                .style('display', 'none');
+
+            const baseColor = '#0d6efd';
+            const hoverColor = '#0b5ed7';
+            const selectedColor = '#d32f2f';
+
+            // Points
+            svg.selectAll('.value-point')
+                .data(series)
+                .enter()
+                .append('circle')
+                .attr('class', 'value-point')
+                .attr('cx', d => xScale(d.x))
+                .attr('cy', d => yScale(d.y))
+                .attr('r', POINT_RADIUS)
+                .attr('fill', baseColor)
+                .attr('stroke', baseColor)
+                .attr('stroke-width', 1)
+                .on('mouseover', function (event, d) {
+                    const isSelected = selectedBlock && !selectedBlock.is_other && selectedBlock.block_id === d.block.block_id;
+                    d3.select(this)
+                        .attr('r', isSelected ? SELECTED_RADIUS : HOVER_RADIUS)
+                        .attr('fill', isSelected ? selectedColor : hoverColor)
+                        .attr('stroke', isSelected ? selectedColor : hoverColor);
+                    tooltip.transition().duration(200).style('opacity', 0.9);
+                    const b = d.block;
+                    const bPcsDisplay = b.block_pcs.length === 1
+                        ? `0x${b.start_pc.toString(16)}`
+                        : b.block_pcs.map(pc => '0x' + pc.toString(16)).join(', ');
+                    tooltip.html(
+                        `<strong>PC: ${bPcsDisplay}</strong><br/>
+                         Execution frequency: ${formatMetric(b.execution_frequency)}<br/>
+                         Instructions: ${b.instructions}<br/>
+                         Cost (software version): ${formatMetric(b.metric_before)}<br/>
+                         Cost (accelerated): ${formatMetric(b.metric_after)}<br/>
+                         Effectiveness: ${b.effectiveness.toFixed(2)}<br/>
+                         Verifier cost (accelerated): ${formatMetric(b.metric_after_raw)}<br/>
+                         APC size: ${b.stats_after.main_columns} cols, ${b.stats_after.bus_interactions} bus, ${b.stats_after.constraints} constraints`
+                    )
+                        .style('left', (event.pageX + 10) + 'px')
+                        .style('top', (event.pageY + 10) + 'px');
+
+                    // Guides
+                    guideH
+                        .attr('x1', 0)
+                        .attr('x2', width)
+                        .attr('y1', yScale(d.y))
+                        .attr('y2', yScale(d.y))
+                        .style('display', 'block');
+                    guideV
+                        .attr('x1', xScale(d.x))
+                        .attr('x2', xScale(d.x))
+                        .attr('y1', 0)
+                        .attr('y2', height)
+                        .style('display', 'block');
+
+                    const pctSaved = totalSoftwareCost > 0 ? (d.y / totalSoftwareCost * 100) : 0;
+                    const pctAccel = totalSoftwareCost > 0 ? (d.beforeCum / totalSoftwareCost * 100) : 0;
+                    const reductionFactor = (100 - pctSaved) > 0 ? (100 / (100 - pctSaved)) : Infinity;
+
+                    const isFirstHalf = xScale(d.x) < (width / 2);
+                    // Horizontal labels: right side for first half, left side for second half
+                    const hLabelX = isFirstHalf ? width - 5 : 5;
+                    const hAnchor = isFirstHalf ? 'end' : 'start';
+                    guideHText
+                        .attr('x', hLabelX)
+                        .attr('y', yScale(d.y) - 6)
+                        .attr('text-anchor', hAnchor)
+                        .style('display', 'block')
+                        .text(`Accelerated prover cost: ${formatMetric(d.beforeCum)} (${pctAccel.toFixed(1)}%)`);
+
+                    guideHText2
+                        .attr('x', hLabelX)
+                        .attr('y', yScale(d.y) + 14)
+                        .attr('text-anchor', hAnchor)
+                        .style('display', 'block')
+                        .text(`Saved prover cost: ${formatMetric(d.y)} (${pctSaved.toFixed(1)}%, ${reductionFactor === Infinity ? '∞' : reductionFactor.toFixed(2) + 'x'} reduction)`);
+
+                    guideVText
+                        .attr('x', isFirstHalf ? xScale(d.x) + 4 : xScale(d.x) - 4)
+                        .attr('y', 20)
+                        .attr('text-anchor', isFirstHalf ? 'start' : 'end')
+                        .style('display', 'block')
+                        .text(`Verifier cost: ${formatMetric(d.x)} · APCs: ${d.idx + 1}`);
+                })
+                .on('mouseout', function () {
+                    tooltip.transition().duration(300).style('opacity', 0);
+                    updateValueCostPointStyles();
+                    guideH.style('display', 'none');
+                    guideV.style('display', 'none');
+                    guideHText.style('display', 'none');
+                    guideHText2.style('display', 'none');
+                    guideVText.style('display', 'none');
+                })
+                .on('click', function (event, d) {
+                    event.stopPropagation();
+                    selectBlock(d.block);
+                });
+
+            // Apply selection styling initially
+            updateValueCostPointStyles();
+
+            // Axes
+            svg.append('g')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(xScale).ticks(5, "~s"));
+
+            svg.append('g')
+                .call(d3.axisLeft(yScale).ticks(5).tickFormat(formatMetric));
+
+            // Labels
+            svg.append('text')
+                .attr('transform', `translate(${width / 2}, ${height + margin.bottom - 5})`)
+                .style('text-anchor', 'middle')
+                .text('Added verifier cost (log)');
+
+            svg.append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', 0 - margin.left + 15)
+                .attr('x', 0 - (height / 2))
+                .style('text-anchor', 'middle')
+                .text('Saved prover cost');
+        }
+
         function sortBlocksInLabel(blocks) {
             // Sort blocks by trace cells (descending) by default
             blocks.sort((a, b) => {
                 const column = currentLabelSort.column;
                 let aVal, bVal;
 
-                switch(column) {
+                switch (column) {
                     case 'traceCells':
                         aVal = a.traceCells;
                         bVal = b.traceCells;
@@ -977,7 +1324,7 @@
             const newLabelsHeader = document.getElementById('labelsHeader');
             const newCollapseIcon = newLabelsHeader.querySelector('.collapse-icon');
 
-            newLabelsHeader.addEventListener('click', function() {
+            newLabelsHeader.addEventListener('click', function () {
                 const content = document.getElementById('labelsContent');
                 const icon = this.querySelector('.collapse-icon');
 
@@ -1020,7 +1367,7 @@
                         <td>0x${row.pc.toString(16)}</td>
                         <td class="label-cell">${escapeHtml(row.label)}</td>
                         <td>${row.blockCount}</td>
-                        <td>${formatCellCount(row.traceCells)}</td>
+                        <td>${formatMetric(row.traceCells)}</td>
                         <td>${row.effectiveness.toFixed(2)}</td>
                     </tr>
                 `;
@@ -1028,12 +1375,12 @@
                 // Add blocks as separate rows
                 row.blocks.forEach(block => {
                     tableHtml += `
-                        <tr class="blocks-detail-row" id="${labelId}-detail-${block.block_id}" style="display: none;" data-block-id="${block.block_id}" data-label-id="${labelId}">
+                        <tr class="blocks-detail-row" id="${labelId}-detail-${block.pc}" style="display: none;" data-block-pc="${block.pc}" data-label-id="${labelId}">
                             <td></td>
                             <td>0x${block.pc.toString(16)}</td>
                             <td>...</td>
                             <td></td>
-                            <td>${formatCellCount(block.traceCells)}</td>
+                            <td>${formatMetric(block.traceCells)}</td>
                             <td>${block.effectiveness.toFixed(2)}</td>
                         </tr>
                     `;
@@ -1058,7 +1405,7 @@
 
             // Add click handlers for sorting
             document.querySelectorAll('.labels-table th').forEach(th => {
-                th.addEventListener('click', function() {
+                th.addEventListener('click', function () {
                     const column = this.getAttribute('data-column');
                     if (currentLabelSort.column === column) {
                         // Toggle direction
@@ -1079,7 +1426,7 @@
 
                 // Click on expand icon or first cell to expand
                 const expandCell = tr.querySelector('td:first-child');
-                expandCell.addEventListener('click', function(e) {
+                expandCell.addEventListener('click', function (e) {
                     e.stopPropagation();
 
                     // Find all detail rows for this label
@@ -1095,13 +1442,12 @@
                     }
                 });
 
-                // Click on rest of row to select first block of this label
-                tr.addEventListener('click', function(e) {
+                // Click on rest of row to select first block
+                tr.addEventListener('click', function (e) {
                     if (e.target.closest('td:first-child')) return; // Ignore if clicking expand cell
                     const pc = parseInt(this.getAttribute('data-pc'));
                     const data = processData();
-                    // Find block where any sub-block starts at this PC
-                    const block = data.find(d => d.blocks && d.blocks.some(b => b.start_pc === pc));
+                    const block = data.find(d => d.block_pcs && d.block_pcs.includes(pc));
                     if (block) {
                         selectBlock(block);
                     }
@@ -1110,10 +1456,10 @@
 
             // Add click handlers for individual block rows
             document.querySelectorAll('.blocks-detail-row').forEach(tr => {
-                tr.addEventListener('click', function() {
-                    const blockId = this.getAttribute('data-block-id');
+                tr.addEventListener('click', function () {
+                    const pc = parseInt(this.getAttribute('data-block-pc'));
                     const data = processData();
-                    const block = data.find(d => d.block_id === blockId);
+                    const block = data.find(d => d.block_pcs && d.block_pcs.includes(pc));
                     if (block) {
                         selectBlock(block);
                     }
@@ -1149,7 +1495,36 @@
         function clearHighlights() {
             d3.selectAll('.bar').classed('bar-highlight', false);
         }
-        
+
+        function updateBarSelection() {
+            if (!selectedBlock || selectedBlock.is_other) return;
+            d3.selectAll('.bar')
+                .classed('bar-selected', d => d.block_id === selectedBlock.block_id);
+        }
+
+        function updateInfoText() {
+            if (!plotInfoText) return;
+            const showingEffectiveness = chartTabSecondary.style.display === 'none';
+            if (showingEffectiveness) {
+                plotInfoText.innerHTML = 'The plot shows each basic block, sorted the proving cost it causes in the software execution:<br>• The <strong>width</strong> corresponds to its cost before acceleration.<br>• The <strong>height</strong> shows the factor by which the cost is reduced after acceleration.';
+            } else {
+                plotInfoText.innerHTML = 'The plot shows the trade-off between added verifier cost and saved proving cost for accelerating basic blocks:<br>• The <strong>x-axis</strong> shows the cumulative verifier cost of accelerated blocks. APCs are added by decreasing density, i.e., the saved proving cost divided by the added verification cost.<br>• The <strong>y-axis</strong> shows the cumulative saved cost achieved by accelerating those blocks.';
+            }
+        }
+
+        function updateValueCostPointStyles() {
+            const baseColor = '#0d6efd';
+            const selectedColor = '#d32f2f';
+            d3.selectAll('.value-point').each(function (d) {
+                const isSelected = selectedBlock && !selectedBlock.is_other && selectedBlock.block_id === d.block.block_id;
+                d3.select(this)
+                    .attr('fill', isSelected ? selectedColor : baseColor)
+                    .attr('stroke', isSelected ? selectedColor : baseColor)
+                    .attr('stroke-width', 1)
+                    .attr('r', isSelected ? SELECTED_RADIUS : POINT_RADIUS);
+            });
+        }
+
         function selectBlock(blockData) {
             // Clear previous selection
             d3.selectAll('.bar').classed('bar-selected', false);
@@ -1164,10 +1539,10 @@
                 d3.selectAll('.bar')
                     .classed('bar-selected', d => d.block_id === blockData.block_id);
 
-                // Update URL with block parameter (use block_id which is the sequence of PCs)
+                // Update URL with block parameter (block_id is comma-separated hex PCs)
                 newUrl.searchParams.set('block', blockData.block_id);
 
-                // Update the PC search input field with first PC
+                // Update the PC search input field with the entry PC
                 pcSearch.value = '0x' + blockData.start_pc.toString(16);
             } else {
                 // Clear block parameter if deselecting or selecting "Other"
@@ -1180,53 +1555,78 @@
 
             // Update code panel selection
             updateCodePanelSelection(blockData);
+            // Update value-cost plot point styling
+            updateValueCostPointStyles();
+            // Update bar selection styling (for re-rendered charts)
+            updateBarSelection();
         }
 
         function showAllCode() {
             const codePanel = document.getElementById('codePanel');
 
-            // Get all blocks sorted by first start_pc
+            // Get all blocks sorted by start_pc
             const allBlocks = processData().sort((a, b) => a.start_pc - b.start_pc);
 
             let codeHtml = '';
             allBlocks.forEach((block, index) => {
                 if (block.is_other) return; // Skip "Other" grouped blocks
 
-                // Check if this block's first start_pc has labels
-                const pcKey = block.start_pc.toString();
-                let labelData = '';
-                if (currentLabels[pcKey] && currentLabels[pcKey].length > 0) {
-                    const labels = currentLabels[pcKey];
-                    const labelsHtml = labels.map(label =>
-                        `<div class="label-name">${escapeHtml(label)}</div>`
-                    ).join('');
-                    // Store labels as JSON array to preserve them correctly
-                    labelData = JSON.stringify(labels);
-                    codeHtml += `
-                        <div class="label-line" data-pc="${block.start_pc}" data-block-id="${block.block_id}" data-labels='${labelData}'>
-                            ${labelsHtml}
-                        </div>
-                    `;
+                // Check for gap between previous superblock and current superblock
+                if (index > 0) {
+                    const prevBlock = allBlocks[index - 1];
+                    if (!prevBlock.is_other) {
+                        const prevBlockEnd = prevBlock.end_pc;
+                        const gap = block.start_pc - prevBlockEnd;
+                        const missingInstructions = gap / 4;
+
+                        if (missingInstructions > 0) {
+                            codeHtml += `
+                                <div style="padding: 10px; margin: 10px 0; background-color: #f0f0f0; border-left: 3px solid #999; font-style: italic; color: #666;">
+                                    ... ${missingInstructions} instruction${missingInstructions !== 1 ? 's' : ''} not shown (0x${prevBlockEnd.toString(16)} - 0x${(block.start_pc - 4).toString(16)}) ...
+                                </div>
+                            `;
+                        }
+                    }
                 }
 
-                const blockElementId = `block-${block.block_id}`;
-                const pcsDisplay = block.blocks.map(b => '0x' + b.start_pc.toString(16)).join(' → ');
-                const headerText = `PCs: ${pcsDisplay} | Cells: ${formatCellCount(block.software_version_cells)} | Effectiveness: ${block.effectiveness.toFixed(2)} | Instructions: ${block.instructions}`;
-
-                // Build the code lines showing each sub-block
-                let linesHtml = '';
-                block.blocks.forEach((subBlock, subIdx) => {
-                    // Add sub-block header if there are multiple sub-blocks
-                    if (block.blocks.length > 1) {
-                        linesHtml += `<div style="color: #666; font-size: 11px; margin-top: ${subIdx > 0 ? '10px' : '5px'}; margin-bottom: 2px; border-top: ${subIdx > 0 ? '1px dashed #ddd' : 'none'}; padding-top: ${subIdx > 0 ? '5px' : '0'};">Sub-block ${subIdx + 1}: PC 0x${subBlock.start_pc.toString(16)}</div>`;
+                // Check all basic block PCs for labels
+                let labelData = '';
+                for (const basicBlock of block.original_blocks) {
+                    const pcKey = basicBlock.start_pc.toString();
+                    if (currentLabels[pcKey] && currentLabels[pcKey].length > 0) {
+                        const labels = currentLabels[pcKey];
+                        const labelsHtml = labels.map(label =>
+                            `<div class="label-name">${escapeHtml(label)}</div>`
+                        ).join('');
+                        labelData = JSON.stringify(labels);
+                        codeHtml += `
+                            <div class="label-line" data-pc="${block.start_pc}" data-labels='${labelData}'>
+                                ${labelsHtml}
+                            </div>
+                        `;
+                        break; // Use first matching label for the sticky header
                     }
-                    subBlock.statements.forEach((stmt, idx) => {
-                        linesHtml += `<div class="code-line" data-block-id="${block.block_id}" data-sub-block="${subIdx}" data-line="${idx}">${escapeHtml(stmt)}</div>`;
-                    });
-                });
+                }
+
+                const blockId = `block-${block.block_pcs.join('_')}`;
+                const pcsText = block.block_pcs.length === 1
+                    ? `PC: 0x${block.start_pc.toString(16)}`
+                    : `PCs: ${block.block_pcs.map(pc => '0x' + pc.toString(16)).join(', ')}`;
+                const headerText = `${pcsText} | Cost (software): ${formatMetric(block.metric_before)} | Effectiveness: ${block.effectiveness.toFixed(2)} | Instructions: ${block.instructions}`;
+
+                // Render each basic block as a sub-section within the superblock
+                const linesHtml = block.original_blocks.map((basicBlock, bbIdx) => {
+                    const subHeader = block.original_blocks.length > 1
+                        ? `<div style="padding: 2px 8px; font-size: 0.8em; color: #888; border-top: 1px dashed #ccc; margin-top: 2px;">basic block 0x${basicBlock.start_pc.toString(16)}</div>`
+                        : '';
+                    const instrs = basicBlock.instructions.map((stmt, idx) =>
+                        `<div class="code-line" data-pc="${basicBlock.start_pc}" data-line="${idx}">${escapeHtml(stmt)}</div>`
+                    ).join('');
+                    return subHeader + instrs;
+                }).join('');
 
                 codeHtml += `
-                    <div class="code-block" id="${blockElementId}" data-block-id="${block.block_id}" data-labels='${labelData}'>
+                    <div class="code-block" id="${blockId}" data-pc="${block.start_pc}" data-labels='${labelData}'>
                         <div class="code-block-header">${headerText}</div>
                         ${linesHtml}
                     </div>
@@ -1237,9 +1637,9 @@
 
             // Add click handlers to code lines
             document.querySelectorAll('.code-line').forEach(line => {
-                line.addEventListener('click', function() {
-                    const blockId = this.getAttribute('data-block-id');
-                    const blockData = allBlocks.find(b => b.block_id === blockId);
+                line.addEventListener('click', function () {
+                    const pc = parseInt(this.getAttribute('data-pc'));
+                    const blockData = allBlocks.find(b => b.block_pcs && b.block_pcs.includes(pc));
                     if (blockData) {
                         selectBlock(blockData);
                     }
@@ -1261,11 +1661,12 @@
 
         function handleStickyLabelClick() {
             const stickyHeader = document.getElementById('stickyLabelHeader');
-            const blockId = stickyHeader.getAttribute('data-block-id');
+            const pc = stickyHeader.getAttribute('data-pc');
 
-            if (blockId) {
+            if (pc) {
+                const pcValue = parseInt(pc);
                 const data = processData();
-                const block = data.find(d => d.block_id === blockId);
+                const block = data.find(d => d.block_pcs && d.block_pcs.includes(pcValue));
 
                 if (block) {
                     selectBlock(block);
@@ -1285,8 +1686,8 @@
 
             // Get all blocks and labels
             const elements = codePanel.querySelectorAll('.label-line, .code-block');
-            let currentLabelsList = null;
-            let currentBlockId = null;
+            let currentLabels = null;
+            let currentPc = null;
 
             for (let i = 0; i < elements.length; i++) {
                 const element = elements[i];
@@ -1301,8 +1702,8 @@
                 const labelsAttr = element.getAttribute('data-labels');
                 if (labelsAttr && labelsAttr !== '""' && labelsAttr !== '') {
                     try {
-                        currentLabelsList = JSON.parse(labelsAttr);
-                        currentBlockId = element.getAttribute('data-block-id');
+                        currentLabels = JSON.parse(labelsAttr);
+                        currentPc = element.getAttribute('data-pc');
                     } catch (e) {
                         // Ignore parse errors
                     }
@@ -1310,16 +1711,16 @@
             }
 
             // Update sticky header
-            if (currentLabelsList && currentLabelsList.length > 0 && currentBlockId) {
-                const labelHtml = currentLabelsList.map(label =>
+            if (currentLabels && currentLabels.length > 0 && currentPc) {
+                const labelHtml = currentLabels.map(label =>
                     `<div class="label-name">${escapeHtml(label)}</div>`
                 ).join('');
                 stickyHeader.innerHTML = labelHtml;
-                stickyHeader.setAttribute('data-block-id', currentBlockId);
+                stickyHeader.setAttribute('data-pc', currentPc);
                 stickyHeader.classList.add('active');
             } else {
                 stickyHeader.classList.remove('active');
-                stickyHeader.removeAttribute('data-block-id');
+                stickyHeader.removeAttribute('data-pc');
             }
         }
 
@@ -1342,27 +1743,32 @@
             if (blockData.is_other) {
                 codeInfo.innerHTML = `
                     <strong>Other blocks (${blockData.count} APCs grouped)</strong><br/>
-                    <span>Cells (software version): ${formatCellCount(blockData.software_version_cells)}</span> •
-                    <span>Execution frequency: ${formatCellCount(blockData.execution_frequency)}</span><br/>
+                    <span>Execution frequency: ${formatMetric(blockData.execution_frequency)}</span><br/>
+                    <span>Cost (software version): ${formatMetric(blockData.software_version_cells)}</span><br/>
+                    <span>Cost (accelerated): ${formatMetric(blockData.metric_after || 0)}</span><br/>
                     <span>Effectiveness: ${blockData.effectiveness.toFixed(2)}</span><br/>
-                    <span>APC size (total): ${blockData.stats_after.main_columns || 0} columns, ${blockData.stats_after.bus_interactions || 0} bus interactions, ${blockData.stats_after.constraints || 0} constraints</span>
+                    <span>Verifier cost (accelerated): n/a</span><br/>
+                    <span>APC size (total): ${blockData.stats_after.main_columns || 0} cols, ${blockData.stats_after.bus_interactions || 0} bus, ${blockData.stats_after.constraints || 0} constraints</span>
                 `;
                 return;
             }
 
-            const pcsDisplay = blockData.blocks.map(b => '0x' + b.start_pc.toString(16)).join(' → ');
+            const pcsDisplay = blockData.block_pcs.length === 1
+                ? `0x${blockData.start_pc.toString(16)}`
+                : blockData.block_pcs.map(pc => '0x' + pc.toString(16)).join(', ');
             codeInfo.innerHTML = `
-                <strong>Block PCs: ${pcsDisplay}</strong><br/>
-                <span>Cells (software version): ${formatCellCount(blockData.software_version_cells)}</span> •
-                <span>Execution frequency: ${formatCellCount(blockData.execution_frequency)}</span> •
-                <span>Instructions: ${blockData.instructions}</span> •
-                <span>Sub-blocks: ${blockData.blocks.length}</span><br/>
+                <strong>Block at PC: ${pcsDisplay}</strong><br/>
+                <span>Execution frequency: ${formatMetric(blockData.execution_frequency)}</span><br/>
+                <span>Instructions: ${blockData.instructions}</span><br/>
+                <span>Cost (software version): ${formatMetric(blockData.metric_before)}</span><br/>
+                <span>Cost (accelerated): ${formatMetric(blockData.metric_after)}</span><br/>
                 <span>Effectiveness: ${blockData.effectiveness.toFixed(2)}</span><br/>
-                <span>APC size: ${blockData.stats_after.main_columns} columns, ${blockData.stats_after.bus_interactions} bus interactions, ${blockData.stats_after.constraints} constraints</span>
+                <span>Verifier cost (accelerated): ${formatMetric(blockData.metric_after_raw)}</span><br/>
+                <span>APC size: ${blockData.stats_after.main_columns} cols, ${blockData.stats_after.bus_interactions} bus, ${blockData.stats_after.constraints} constraints</span>
             `;
 
-            // Highlight the selected block
-            const blockElement = document.getElementById(`block-${blockData.block_id}`);
+            // Highlight the selected superblock
+            const blockElement = document.getElementById(`block-${blockData.block_pcs.join('_')}`);
             if (blockElement) {
                 blockElement.classList.add('selected');
 
@@ -1398,8 +1804,9 @@
 
             // Set dimensions and margins
             const margin = { top: 40, right: 120, bottom: 60, left: 80 };
-            const width = 1200 - margin.left - margin.right;
-            const height = 225 - margin.top - margin.bottom;
+            const containerWidth = document.getElementById('chart').clientWidth || 1200;
+            const width = containerWidth - margin.left - margin.right;
+            const height = 270 - margin.top - margin.bottom;
 
             // Group small blocks (< 0.1% threshold)
             const threshold = totalCells * 0.001;
@@ -1445,7 +1852,7 @@
                 .append('svg')
                 .attr('width', width + margin.left + margin.right)
                 .attr('height', height + margin.top + margin.bottom)
-                .on('click', function(event) {
+                .on('click', function (event) {
                     // If clicking on the background (not a bar), deselect
                     if (event.target.tagName === 'svg') {
                         selectBlock(null);
@@ -1460,7 +1867,7 @@
                 .attr('height', height)
                 .style('fill', 'none')
                 .style('pointer-events', 'all')
-                .on('click', function(event) {
+                .on('click', function (event) {
                     event.stopPropagation();
                     selectBlock(null);
                 });
@@ -1493,9 +1900,11 @@
                 .range([height, 0]);
 
             // Color scale for instructions (log scale)
-            const validInstructions = plotData.filter(d => !d.is_other).map(d => d.instructions);
+            const validInstructions = plotData.filter(d => !d.is_other && d.instructions > 0).map(d => d.instructions);
+            const instrMin = d3.min(validInstructions) || 1;
+            const instrMax = d3.max(validInstructions) || instrMin;
             const colorScale = d3.scaleSequentialLog()
-                .domain([d3.min(validInstructions), d3.max(validInstructions)])
+                .domain([instrMin, instrMax])
                 .interpolator(d3.interpolateRdYlGn);
 
             // Add grid
@@ -1536,23 +1945,24 @@
                     let content = '';
                     if (d.is_other) {
                         content = `<strong>Other (${d.count} APCs)</strong><br/>
-                                  Cells (software version): ${formatCellCount(d.software_version_cells)}<br/>
-                                  Execution frequency: ${formatCellCount(d.execution_frequency)}<br/>
+                                  Execution frequency: ${formatMetric(d.execution_frequency)}<br/>
+                                  Cost (software version): ${formatMetric(d.software_version_cells)}<br/>
+                                  Cost (accelerated): ${formatMetric(d.metric_after || 0)}<br/>
                                   Effectiveness: ${d.effectiveness.toFixed(2)}<br/>
-                                  APC columns (total): ${d.stats_after.main_columns || 'N/A'}<br/>
-                                  APC bus interactions (total): ${d.stats_after.bus_interactions || 'N/A'}<br/>
-                                  APC constraints (total): ${d.stats_after.constraints || 'N/A'}`;
+                                  Verifier cost (accelerated): n/a<br/>
+                                  APC size (total): ${d.stats_after.main_columns || 'N/A'} cols, ${d.stats_after.bus_interactions || 'N/A'} bus, ${d.stats_after.constraints || 'N/A'} constraints`;
                     } else {
-                        const pcsDisplay = d.blocks.map(b => '0x' + b.start_pc.toString(16)).join(' → ');
-                        content = `<strong>PCs: ${pcsDisplay}</strong><br/>
-                                  Cells (software version): ${formatCellCount(d.software_version_cells)}<br/>
-                                  Execution frequency: ${formatCellCount(d.execution_frequency)}<br/>
-                                  Effectiveness: ${d.effectiveness.toFixed(2)}<br/>
+                        const dPcsDisplay = d.block_pcs.length === 1
+                            ? `0x${d.start_pc.toString(16)}`
+                            : d.block_pcs.map(pc => '0x' + pc.toString(16)).join(', ');
+                        content = `<strong>PC: ${dPcsDisplay}</strong><br/>
+                                  Execution frequency: ${formatMetric(d.execution_frequency)}<br/>
                                   Instructions: ${d.instructions}<br/>
-                                  Sub-blocks: ${d.blocks.length}<br/>
-                                  APC columns: ${d.stats_after.main_columns}<br/>
-                                  APC bus interactions: ${d.stats_after.bus_interactions}<br/>
-                                  APC constraints: ${d.stats_after.constraints}`;
+                                  Cost (software version): ${formatMetric(d.metric_before)}<br/>
+                                  Cost (accelerated): ${formatMetric(d.metric_after)}<br/>
+                                  Effectiveness: ${d.effectiveness.toFixed(2)}<br/>
+                                  Verifier cost (accelerated): ${formatMetric(d.metric_after_raw)}<br/>
+                                  APC size: ${d.stats_after.main_columns} cols, ${d.stats_after.bus_interactions} bus, ${d.stats_after.constraints} constraints`;
                     }
 
                     tooltip.html(content)
@@ -1573,12 +1983,12 @@
                     // Clear highlights
                     clearHighlights();
                 })
-                .on('click', function(event, d) {
+                .on('click', function (event, d) {
                     event.stopPropagation();
-                    // Select this block on click
+                    // Select this superblock on click
                     selectBlock(d);
                 });
-            
+
             // Note: Selection is handled in the selectBlock function after chart is created
 
             // Add "Other" label for wide enough other blocks
@@ -1604,12 +2014,13 @@
             svg.append('g')
                 .attr('transform', `translate(0,${height})`)
                 .call(d3.axisBottom(xScale)
-                    .tickFormat(d => formatCellCount(d)));
+                    .tickFormat(d => formatMetric(d)));
 
             svg.append('g')
                 .call(d3.axisLeft(yScale));
 
             // Add labels
+            const effType = effectivenessType.options[effectivenessType.selectedIndex].text;
             svg.append('text')
                 .attr('transform', 'rotate(-90)')
                 .attr('y', 0 - margin.left)
@@ -1621,10 +2032,9 @@
             svg.append('text')
                 .attr('transform', `translate(${width / 2}, ${height + margin.bottom})`)
                 .style('text-anchor', 'middle')
-                .text('Cumulative instruction trace cells (software version)');
+                .text(`Cumulative ${effType.toLowerCase()} before (software version)`);
 
             // Add title
-            const effType = effectivenessType.options[effectivenessType.selectedIndex].text;
             svg.append('text')
                 .attr('x', width / 2)
                 .attr('y', 0 - margin.top / 2)
@@ -1658,7 +2068,7 @@
                 const legendHeight = 200;
 
                 const legendScale = d3.scaleLinear()
-                    .domain([Math.log10(d3.min(validInstructions)), Math.log10(d3.max(validInstructions))])
+                    .domain([Math.log10(instrMin), Math.log10(instrMax)])
                     .range([legendHeight, 0]);
 
                 const legendAxis = d3.axisRight(legendScale)
@@ -1681,7 +2091,7 @@
                 const steps = 20;
                 for (let i = 0; i <= steps; i++) {
                     const t = i / steps;
-                    const value = d3.min(validInstructions) * Math.pow(d3.max(validInstructions) / d3.min(validInstructions), t);
+                    const value = instrMin * Math.pow(instrMax / instrMin, t);
                     gradient.append('stop')
                         .attr('offset', `${t * 100}%`)
                         .style('stop-color', colorScale(value));
@@ -1704,6 +2114,9 @@
                     .style('font-size', '12px')
                     .text('Instructions (log)');
             }
+
+            // Apply selection styling if a block is already selected
+            updateBarSelection();
         }
     </script>
 </body>
